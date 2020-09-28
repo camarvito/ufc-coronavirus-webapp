@@ -17,8 +17,9 @@ export default new Vuex.Store({
         setUser(state, user) {
             state.user = user
             if (user) {
-                // prettier-ignore
-                axios.defaults.headers.common['Authorization'] = `${user.token}`
+                axios.defaults.headers.common[
+                    'Authorization'
+                ] = `Bearer ${user.token}`
             } else {
                 delete axios.defaults.headers.common['Authorization']
             }

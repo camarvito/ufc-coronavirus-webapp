@@ -8,9 +8,11 @@ import Auth from '../views/Auth.vue'
 import NecessityPage from '../components/Necessities/NecessityPage.vue'
 import ActionPage from '../components/Actions/ActionPage.vue'
 import AdminPages from '../components/Admin/AdminPages.vue'
+import Places from '../components/Admin/Places/Places.vue'
 import Dashboard from '../components/Admin/Dashboard/Dashboard.vue'
 import Notifications from '../components/Admin/Notifications/Notifications.vue'
 import myActions from '../components/Admin/MyActions/MyActions.vue'
+import MyNecessities from '../components/Admin/MyNecessities/MyNecessities.vue'
 import notFound from '../views/notFound.vue'
 import Users from '../components/Admin/Users/Users.vue'
 
@@ -36,8 +38,8 @@ const routes = [
             { path: 'my-profile' },
             { path: 'my-actions', component: myActions },
             { path: 'my-productions' },
-            { path: 'my-necessities' },
-            { path: 'locations' },
+            { path: 'my-necessities', component: MyNecessities },
+            { path: 'locations', component: Places },
             { path: 'users', component: Users },
             { path: 'contact' }
         ]
@@ -49,7 +51,7 @@ const routes = [
     },
     {
         name: 'necessityPage',
-        path: '/necessities',
+        path: '/necessities/:id',
         component: NecessityPage
     },
     {

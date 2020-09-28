@@ -15,7 +15,7 @@ export default {
     computed: {
         userName: {
             get() {
-                return this.$store.state.user.user.fullname
+                return this.$store.state.user.data.name
             }
         }
     }
@@ -28,7 +28,7 @@ export default {
     justify-content: space-between;
     background-color: #f7f7f7;
     border-radius: 1.5rem;
-    padding: 1rem;
+    padding: 2rem !important;
 
     &__text-area {
         padding: 2rem 1rem;

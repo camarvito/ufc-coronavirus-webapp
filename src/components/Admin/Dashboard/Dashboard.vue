@@ -3,9 +3,10 @@
         <DashboardHeader />
         <div class="card-row">
             <DashboardTableCard
-                v-for="card in cards"
-                :key="card.title"
+                v-for="(card, index) in cards"
+                :key="index"
                 :title="card.title"
+                :quantity="values.length"
                 :isSelected="card.selected"
                 @selected="changeCardSelected(card)"
             />
@@ -54,17 +55,21 @@ export default {
         getTableData() {
             const url = `${baseApiUrl}/actions`
             axios.get(url).then(res => {
-                this.values = res.data.map(el => {
-                    const fields = {}
-
-                    fields.id = el.id
-                    fields.title = el.title
-                    fields.createdAt = el.created_at
-                    fields.updatedAt = el.updated_at
-                    fields.user = el.user.fullname
-
-                    return fields
-                })
+                this.values = res.data.actions.map((action) => ({
+                    id: action._id,
+                    title: action.title,
+                    createdAt: new Date(action.createdAt).toLocaleDateString('pt-br', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    }),
+                    updatedAt: new Date(action.updatedAt).toLocaleDateString('pt-br', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                    }),
+                    author: action.author.name
+                }))
             })
         },
         changeCardSelected(card) {

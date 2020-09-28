@@ -1,6 +1,8 @@
 <template>
     <div class="sidebar">
-        <img src="@/assets/svg/logo_purple.svg" alt="logo-combate-covid" />
+        <img src="@/assets/svg/logo_purple.svg"
+          alt="logo-combate-covid"
+          @click="$router.push('/')" />
         <div class="list__area">
             <ul class="sidebar__list">
                 <router-link
@@ -60,12 +62,17 @@
                     Minhas Necessidades
                 </router-link>
 
-                <li class="sidebar__list--li disabled">
+                <router-link
+                    tag="li"
+                    to="/dashboard/locations"
+                    exact-active-class="selected"
+                    class="sidebar__list--li"
+                >
                     <svg class="icon">
                         <use xlink:href="@/assets/svg/sprites.svg#pin" />
                     </svg>
                     Locais
-                </li>
+                </router-link>
             </ul>
 
             <ul class="sidebar__list">

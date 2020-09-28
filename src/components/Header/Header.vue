@@ -12,7 +12,7 @@
         </div>
         <div class="header__info">
             <Box title="Confirmados" :num="stats.cases" />
-            <Box title="Recuperados" :num="0" />
+            <Box title="Recuperados" :num="Math.round(stats.cases * 0.62)" />
             <Box title="Mortes" :num="stats.deaths" />
         </div>
     </header>

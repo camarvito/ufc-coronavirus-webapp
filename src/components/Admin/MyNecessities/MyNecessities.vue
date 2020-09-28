@@ -1,5 +1,5 @@
 <template>
-    <div class="my-actions">
+    <div class="my-needs">
         <div class="my-actions__header">
             <AdminPageTitle :title="pageTitle">{{ pageSub }}</AdminPageTitle>
             <ActionButton v-if="mode === 'list'" title="Adicionar" :action="addNewAction" />
@@ -24,35 +24,79 @@
         <div class="my-actions__content" v-if="mode === 'content'">
             <!--Step 1-->
             <div v-if="step === 1" class="my-actions__content--step">
-                <label for="title">Titulo da ação</label>
+                <label for="title">Titulo da necessidade</label>
                 <input
                     type="text"
                     id="title"
-                    placeholder="Ex: Confecção de máscaras"
-                    v-model="action.title"
+                    placeholder="Ex: Máscaras"
+                    v-model="need.title"
                 />
 
                 <label for="subtitle">Subtítulo</label>
                 <input
                     type="text"
                     id="subtitle"
-                    placeholder="Ex: Postos de saúde precisam de máscaras"
-                    v-model="action.subtitle"
+                    placeholder="Ex: Posto de saúde precisando de máscaras"
+                    v-model="need.subtitle"
                 />
 
-                <label>Conteúdo</label>
-                <VueEditor v-model="action.content" placeholder="Informe o Post da Ação..." />
+                <label for="subtitle">Texto de doação</label>
+                <input
+                    type="text"
+                    id="subtitle"
+                    placeholder="Ex: Para doar entre contato conosco..."
+                    v-model="need.donateText"
+                />
+
+                <label for="imageUrl">Imagem da necessidade</label>
+                <input
+                    type="text"
+                    id="imageUrl"
+                    placeholder="URL da Imagem"
+                    v-model="need.imageUrl"
+                />
+
+                <label for="searchUrl">URL de busca na internet</label>
+                <input
+                    type="text"
+                    id="searchUrl"
+                    placeholder="URL de busca"
+                    v-model="need.searchUrl"
+                />
             </div>
 
             <!--Step 2-->
             <div v-if="step === 2" class="my-actions__content--step">
-                <label for="imageUrl">URL da Imagem</label>
+                <label for="imageUrl">Local de necessidade</label>
+                <select v-model="p">
+                  <option v-for="(place, index) in allPlaces"
+                    :value="place"
+                    :key="index"> {{ place.name }}</option>
+                </select>
+
+
+                <label for="imageUrl">Quantidade</label>
                 <input
-                    type="text"
+                    type="number"
                     id="imageUrl"
+                    autocomplete="off"
                     placeholder="Informe a URL da imagem do artigo..."
-                    v-model="action.imageUrl"
+                    v-model="productQuantity"
                 />
+
+                <button @click="() => {
+                  this.selectedPlaces.push({ place: this.p, quantity: this.productQuantity });
+                  this.productQuantity = ''
+                  this.logg()
+                }">+ Inserir</button>
+
+                <Table :titles="['Local Necessitado', 'Quantidade']"
+                :values="selectedPlaces.map(l => {
+                  return { name: l.place.name, quantity: l.quantity }
+                })"
+                :editFunction="editAction"
+                :deleteFunction="deleteAction" />
+
             </div>
 
             <!--Bottom -->
@@ -72,7 +116,6 @@
 <script>
 import axios from 'axios'
 
-import { VueEditor } from 'vue2-editor'
 import { baseApiUrl } from '@/global'
 
 import AdminPageTitle from '../General/AdminPageTitle'
@@ -81,32 +124,34 @@ import Table from '../General/Table'
 
 export default {
     components: {
-        VueEditor,
         AdminPageTitle,
         ActionButton,
         Table
     },
     data() {
         return {
+            p: '',
             mode: 'list',
             step: 1,
             titles: [
                 'ID',
                 'Título',
-                'Criado em',
-                'Última Atualização',
-                'Responsável',
+                'Quantidade',
+                'Situação',
                 ' ',
                 ' '
             ],
+            productQuantity: '',
             values: [],
-            action: {}
+            allPlaces: [],
+            selectedPlaces: [],
+            need: {}
         }
     },
     computed: {
         pageTitle() {
             if (this.mode === 'list') {
-                return 'Minhas ações'
+                return 'Minhas Necessidades'
             }
 
             if (this.mode === 'content' && this.step === 1) {
@@ -147,27 +192,40 @@ export default {
         }
     },
     methods: {
-        loadUserActions() {
-            const url = `${baseApiUrl}/actions`
+        logg() {
+            console.log(this.selectedPlaces)
+        },
+        loadPlaces() {
+            const url = `${baseApiUrl}/places`
             axios.get(url).then(res => {
-                this.values = res.data.actions
-                    .filter(el => el.author._id === this.$store.state.user.data._id)
+                this.allPlaces = res.data.places
+                    .map(el => {
+                        const fields = {}
+
+                        fields.id = el._id
+                        fields.name = el.name
+                        fields.street = el.street
+                        fields.uf = el.uf
+                        fields.city = el.city
+                        fields.imageUrl = el.imageUrl
+
+                        return fields
+                    })
+            })
+        },
+        loadUserActions() {
+            const url = `${baseApiUrl}/needs`
+            axios.get(url).then(res => {
+                console.log(res)
+                this.values = res.data.needs
+                    .filter(el => el.manager._id === this.$store.state.user.data._id)
                     .map(el => {
                         const fields = {}
 
                         fields.id = el._id
                         fields.title = el.title
-                        fields.createdAt = new Date(el.createdAt).toLocaleDateString('pt-br', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })
-                        fields.updatedAt = new Date(el.updatedAt).toLocaleDateString('pt-br', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })
-                        fields.user = el.author.name
+                        fields.quantity = el.quantity
+                        fields.situation = el.situation
 
                         return fields
                     })
@@ -183,29 +241,36 @@ export default {
             }
 
             if (this.step === 2) {
-                this.action.authorId = this.$store.state.user.data._id
+                this.need.needyPlaces = this.selectedPlaces
+                    .map(e => ({ place: e.place.id, quantity: e.quantity }))
 
-                if (this.action._id) {
-                    axios
-                        .patch(`${baseApiUrl}/actions/${this.action._id}`, this.action)
-                        .then(() => {
-                            this.step = 1
-                            this.mode = 'list'
-                            this.action = {}
-                            this.loadUserActions()
-                        })
-                        .catch(err => console.log(err))
-                } else {
-                    axios
-                        .post(`${baseApiUrl}/actions`, this.action)
-                        .then(() => {
-                            this.step = 1
-                            this.mode = 'list'
-                            this.action = {}
-                            this.loadUserActions()
-                        })
-                        .catch(err => console.log(err))
-                }
+                this.need.managerId = this.$store.state.user.data._id
+                this.need.situation = 'Em andamento'
+
+                // console.log(this.need)
+
+                axios.post(`${baseApiUrl}/needs`, this.need)
+                    .then(() => {
+                        this.step = 1
+                        this.mode = 'list'
+                        this.need = {}
+                        this.loadUserActions()
+                    })
+                    .catch(err => console.log(err))
+                // this.action.authorId = this.$store.state.user.data._id
+
+                // if (this.action._id) {
+                //     axios
+                //         .patch(`${baseApiUrl}/actions/${this.action._id}`, this.action)
+                //         .then(() => {
+                //             this.step = 1
+                //             this.mode = 'list'
+                //             this.action = {}
+                //             this.loadUserActions()
+                //         })
+                //         .catch(err => console.log(err))
+                // } else {
+                // }
             }
         },
         previousStepAction() {
@@ -227,7 +292,7 @@ export default {
                 })
         },
         deleteAction(id) {
-            const url = `${baseApiUrl}/actions/${id}`
+            const url = `${baseApiUrl}/needs/${id}`
             axios
                 .delete(url)
                 .then(() => {
@@ -240,6 +305,7 @@ export default {
     },
     mounted() {
         this.loadUserActions()
+        this.loadPlaces()
     }
 }
 </script>

@@ -1,25 +1,51 @@
 <template>
     <table class="table">
         <tr class="title-row">
-            <th v-for="title in titles" :key="title">{{ title }}</th>
+            <th v-for="(title, index) in titles" :key="index">{{ title }}</th>
         </tr>
-        <tr
-            v-for="value in values"
-            :key="values.indexOf(value)"
-            :class="{ dark: values.indexOf(value) % 2 === 0 }"
-        >
-            <td v-for="field in value" :key="field">{{ field }}</td>
-            <td v-if="editFunction" style="padding: 0 1rem;">
-                <svg class="icon edit">
-                    <use xlink:href="@/assets/svg/sprites.svg#pencil" />
-                </svg>
+        <template v-if="!places">
+          <tr
+              v-for="(value, index) in values"
+              :key="index"
+              :class="{ dark: values.indexOf(value) % 2 === 0 }"
+          >
+              <td v-for="(field, index) in value" :key="index">{{ field }}</td>
+              <td v-if="editFunction" style="padding: 0 1rem;">
+                  <svg class="icon edit" @click="editFunction(value.id)">
+                      <use xlink:href="@/assets/svg/sprites.svg#pencil" />
+                  </svg>
+              </td>
+              <td v-if="deleteFunction" style="padding: 0 1rem;">
+                  <svg class="icon delete" @click="deleteFunction(value.id)">
+                      <use xlink:href="@/assets/svg/sprites.svg#delete" />
+                  </svg>
+              </td>
+          </tr>
+        </template>
+        <!-- Table for places -->
+        <template v-else>
+          <tr
+              v-for="(value, index) in values"
+              :key="index"
+              :class="{ dark: values.indexOf(value) % 2 === 0 }"
+          >
+            <td>
+              <img :src="value.imageUrl" alt="place-image">
             </td>
-            <td v-if="deleteFunction" style="padding: 0 1rem;">
-                <svg class="icon delete" @click="deleteFunction(value.id)">
-                    <use xlink:href="@/assets/svg/sprites.svg#delete" />
-                </svg>
+            <td>
+              {{ value.name }}
             </td>
-        </tr>
+            <td>
+              {{ value.street }}
+            </td>
+            <td>
+              {{ value. city }}
+            </td>
+            <td>
+              {{ value.uf }}
+            </td>
+          </tr>
+        </template>
     </table>
 </template>
 
@@ -34,6 +60,11 @@ export default {
             type: Array,
             required: false
         },
+        places: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         editFunction: {
             type: Function,
             required: false
@@ -42,6 +73,9 @@ export default {
             type: Function,
             required: false
         }
+    },
+    computed: {
+
     }
 }
 </script>
@@ -57,6 +91,12 @@ export default {
 
     tr {
         height: 60px;
+    }
+
+    img {
+      height: 4rem;
+      width: 4rem;
+      border-radius: 50%;
     }
 }
 

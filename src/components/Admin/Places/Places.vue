@@ -2,7 +2,7 @@
     <div class="my-actions">
         <div class="my-actions__header">
             <AdminPageTitle :title="pageTitle">{{ pageSub }}</AdminPageTitle>
-            <ActionButton v-if="mode === 'list'" title="Adicionar" :action="addNewAction" />
+            <ActionButton v-if="mode === 'list'" title="Adicionar" :action="addNewPlace" />
         </div>
 
         <!--Mode: List -->
@@ -16,6 +16,7 @@
             </svg>
             <Table v-else :titles="titles"
               :values="values"
+              :places="true"
               :editFunction="editAction"
               :deleteFunction="deleteAction" />
         </div>
@@ -24,36 +25,64 @@
         <div class="my-actions__content" v-if="mode === 'content'">
             <!--Step 1-->
             <div v-if="step === 1" class="my-actions__content--step">
-                <label for="title">Titulo da ação</label>
+                <label for="name">Nome do local</label>
                 <input
                     type="text"
-                    id="title"
-                    placeholder="Ex: Confecção de máscaras"
-                    v-model="action.title"
+                    id="name"
+                    placeholder="Ex: Hospital Regional do Sertão Central"
+                    v-model="place.name"
                 />
 
-                <label for="subtitle">Subtítulo</label>
+                <label for="street">Rua</label>
                 <input
                     type="text"
-                    id="subtitle"
-                    placeholder="Ex: Postos de saúde precisam de máscaras"
-                    v-model="action.subtitle"
+                    id="street"
+                    placeholder="Ex: Estr. do Algodão"
+                    v-model="place.street"
                 />
 
-                <label>Conteúdo</label>
-                <VueEditor v-model="action.content" placeholder="Informe o Post da Ação..." />
+                <label for="city">Cidade</label>
+                <input
+                    type="text"
+                    id="city"
+                    placeholder="Ex: Quixeramobim"
+                    v-model="place.city"
+                />
+
+                <label for="uf">Estado</label>
+                <input
+                    type="text"
+                    id="uf"
+                    placeholder="Ex: Ceará"
+                    v-model="place.uf"
+                />
+
+                <label for="imageUrl">URL da Imagem</label>
+                <input
+                    type="text"
+                    id="imageUrl"
+                    placeholder="Digite a URL da Imagem"
+                    v-model="place.imageUrl"
+                />
             </div>
 
             <!--Step 2-->
-            <div v-if="step === 2" class="my-actions__content--step">
-                <label for="imageUrl">URL da Imagem</label>
+            <!-- <div v-if="step === 2" class="my-actions__content--step">
+                <label for="imageUrl">Local de necessidade</label>
                 <input
                     type="text"
                     id="imageUrl"
                     placeholder="Informe a URL da imagem do artigo..."
                     v-model="action.imageUrl"
                 />
-            </div>
+                <label for="imageUrl">Quantidade</label>
+                <input
+                    type="text"
+                    id="imageUrl"
+                    placeholder="Informe a URL da imagem do artigo..."
+                    v-model="action.imageUrl"
+                />
+            </div> -->
 
             <!--Bottom -->
             <div class="my-actions__bottom-container">
@@ -71,8 +100,6 @@
 
 <script>
 import axios from 'axios'
-
-import { VueEditor } from 'vue2-editor'
 import { baseApiUrl } from '@/global'
 
 import AdminPageTitle from '../General/AdminPageTitle'
@@ -81,7 +108,6 @@ import Table from '../General/Table'
 
 export default {
     components: {
-        VueEditor,
         AdminPageTitle,
         ActionButton,
         Table
@@ -91,54 +117,53 @@ export default {
             mode: 'list',
             step: 1,
             titles: [
-                'ID',
-                'Título',
-                'Criado em',
-                'Última Atualização',
-                'Responsável',
+                ' ',
+                'Nome do Local',
+                'Rua',
+                'Cidade',
+                'Estado',
                 ' ',
                 ' '
             ],
             values: [],
-            action: {}
+            place: {}
         }
     },
     computed: {
         pageTitle() {
             if (this.mode === 'list') {
-                return 'Minhas ações'
+                return 'Locais'
             }
 
             if (this.mode === 'content' && this.step === 1) {
                 return 'Passo 1'
             }
 
-            return 'Passo 2'
+            return 'Passo 1'
         },
         pageSub() {
             if (this.mode === 'list') {
                 return this.units
             }
 
-            if (this.mode === 'content' && this.step === 1) {
-                return 'Realize 2 passos para criar uma ação'
-            }
+            // if (this.mode === 'content' && this.step === 1) {
+            //     return 'Realize 2 passos para criar uma ação'
+            // }
 
-            return 'Realize o último passo para criar uma ação'
+            return 'Realize apenas 1 passo para adicionar um local'
         },
         nextStepButtonTitle() {
-            if (this.step === 1) {
-                return 'Continuar'
-            }
+            // if (this.step === 1) {
+            //     return 'Continuar'
+            // }
 
             return 'Salvar'
         },
         previousStepButtonTitle() {
-            if (this.step === 1) {
-                return 'Cancelar'
-            }
-
-            return 'Voltar'
+            // if (this.step === 1) {
+            //     return 'Cancelar'
+            // }
+            return 'Cancelar'
         },
         units() {
             return this.values.length
@@ -147,75 +172,59 @@ export default {
         }
     },
     methods: {
-        loadUserActions() {
-            const url = `${baseApiUrl}/actions`
+        loadPlaces() {
+            const url = `${baseApiUrl}/places`
             axios.get(url).then(res => {
-                this.values = res.data.actions
-                    .filter(el => el.author._id === this.$store.state.user.data._id)
+                this.values = res.data.places
                     .map(el => {
                         const fields = {}
 
-                        fields.id = el._id
-                        fields.title = el.title
-                        fields.createdAt = new Date(el.createdAt).toLocaleDateString('pt-br', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })
-                        fields.updatedAt = new Date(el.updatedAt).toLocaleDateString('pt-br', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                        })
-                        fields.user = el.author.name
+                        // fields.id = el._id
+                        fields.name = el.name
+                        fields.street = el.street
+                        fields.uf = el.uf
+                        fields.city = el.city
+                        fields.imageUrl = el.imageUrl
 
                         return fields
                     })
             })
         },
-        addNewAction() {
+        addNewPlace() {
             this.mode = 'content'
         },
         nextStepAction() {
-            if (this.step === 1) {
-                this.step += 1
-                return
-            }
-
-            if (this.step === 2) {
-                this.action.authorId = this.$store.state.user.data._id
-
-                if (this.action._id) {
-                    axios
-                        .patch(`${baseApiUrl}/actions/${this.action._id}`, this.action)
-                        .then(() => {
-                            this.step = 1
-                            this.mode = 'list'
-                            this.action = {}
-                            this.loadUserActions()
-                        })
-                        .catch(err => console.log(err))
-                } else {
-                    axios
-                        .post(`${baseApiUrl}/actions`, this.action)
-                        .then(() => {
-                            this.step = 1
-                            this.mode = 'list'
-                            this.action = {}
-                            this.loadUserActions()
-                        })
-                        .catch(err => console.log(err))
-                }
-            }
+            // if (this.step === 1) {
+            // if (this.need._id) {
+            //     axios
+            //         .patch(`${baseApiUrl}/actions/${this.action._id}`, this.action)
+            //         .then(() => {
+            //             this.step = 1
+            //             this.mode = 'list'
+            //             this.action = {}
+            //             this.loadUserActions()
+            //         })
+            //         .catch(err => console.log(err))
+            // } else {
+            axios
+                .post(`${baseApiUrl}/places`, this.place)
+                .then(() => {
+                    this.step = 1
+                    this.mode = 'list'
+                    this.place = {}
+                    this.loadPlaces()
+                })
+                .catch(err => console.log(err))
+            // }
         },
         previousStepAction() {
-            if (this.step === 1) {
-                this.mode = 'list'
-            }
+            // if (this.step === 1) {
+            this.mode = 'list'
+            // }
 
-            if (this.step === 2) {
-                this.step -= 1
-            }
+            // if (this.step === 2) {
+            //     this.step -= 1
+            // }
         },
         editAction(id) {
             const url = `${baseApiUrl}/actions/${id}`
@@ -239,7 +248,7 @@ export default {
         }
     },
     mounted() {
-        this.loadUserActions()
+        this.loadPlaces()
     }
 }
 </script>

@@ -2,7 +2,7 @@
     <div class="admin-users">
         <AdminPageTitle title="Todos Usuários" />
         <div class="card-container">
-            <UserCard :key="user.email" v-for="user in users" :user="user" />
+            <UserCard v-for="(user, index) in users" :key="index" :user="user" />
         </div>
     </div>
 </template>
@@ -25,7 +25,7 @@ export default {
         loadUsers() {
             const url = `${baseApiUrl}/users`
             axios.get(url).then(res => {
-                this.users = res.data
+                this.users = res.data.users
             })
         }
     },

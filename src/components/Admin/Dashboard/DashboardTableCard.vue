@@ -16,11 +16,10 @@ export default {
         isSelected: {
             type: Boolean,
             required: true
-        }
-    },
-    data() {
-        return {
-            quantity: 2
+        },
+        quantity: {
+            type: Number,
+            required: true
         }
     },
     methods: {

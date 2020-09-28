@@ -37,8 +37,8 @@ export default {
         getActions() {
             const url = `${baseApiUrl}/actions`
             axios.get(url).then(res => {
-                /* Pega apenas as 6 últimas ações para o carrossel */
-                this.actions = res.data.slice(0, 6)
+                /* Take the last 6 actions to put on the carrousel */
+                this.actions = res.data.actions.slice(0, 6)
             })
         }
     },

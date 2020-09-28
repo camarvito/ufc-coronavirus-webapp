@@ -13,7 +13,10 @@ module.exports = {
         'import/extensions': 'off',
         'arrow-parens': 'off',
         'comma-dangle': ['error', 'never'],
-        'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-        'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
+        'no-underscore-dangle': ['error', { allow: ['_id'] }],
+        'no-console':
+            process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+        'no-debugger':
+            process.env.NODE_ENV === 'production' ? 'warn' : 'off'
     }
 }

@@ -1,8 +1,8 @@
 <template>
     <div class="user-card">
         <div class="user-card__top">
-            <h1>{{ user.fullname }}</h1>
-            <h2>--</h2>
+            <h1>{{ user.name }}</h1>
+            <h2>{{ user.locale }}</h2>
             <hr />
         </div>
         <div class="user-card__bottom">

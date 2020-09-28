@@ -3,22 +3,31 @@
         <div class="necessity-card__up">
             <img
                 class="necessity-card__up--img"
-                src="../../assets/img/material3d-cover.png"
+                :src="need.imageUrl"
                 alt="necessity-img"
             />
         </div>
         <div class="necessity-card__bottom">
-            <h3 class="necessity-card__title">Filamento para impressão 3D</h3>
+            <h3 class="necessity-card__title">{{ need.title }}</h3>
             <div class="necessity-card__btn">
-                <button class="necessity-card__btn--find">Achar Produto</button>
-                <button class="necessity-card__btn--contribute">Quero Contribuir</button>
+                <button class="necessity-card__btn--find"
+                @click="searchInternet">Achar Produto</button>
+                <a class="necessity-card__btn--contribute"
+                  :href="`/necessities/${need._id}`">Quero Contribuir</a>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-export default {}
+export default {
+    props: ['need'],
+    methods: {
+        searchInternet() {
+            window.open(this.need.searchUrl)
+        }
+    }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -72,6 +81,8 @@ export default {}
             letter-spacing: 0.1rem;
             color: #2f80ed;
             background-color: #fff;
+            outline: none;
+            cursor: pointer;
         }
 
         &--contribute {
@@ -79,6 +90,7 @@ export default {}
             font-family: 'Roboto', sans-serif;
             font-size: 1.6rem;
             text-transform: uppercase;
+            text-decoration: none;
             padding: 0.5rem 1.5rem;
             border-radius: 0.7rem;
             font-weight: 500;

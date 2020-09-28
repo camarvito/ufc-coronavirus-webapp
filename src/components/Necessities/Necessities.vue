@@ -6,16 +6,19 @@
             <br />para que as ações sejam feitas.
         </SectionTitle>
         <Carrousel
-            :itemsQuantity="items.length"
+            :itemsQuantity="needs.length"
             :windowSize="2"
             :paginationFactor="412"
         >
-            <NecessityCard v-for="item in items" :key="item" />
+            <NecessityCard v-for="(need, index) in needs" :key="index" :need="need" />
         </Carrousel>
     </div>
 </template>
 
 <script>
+import axios from 'axios'
+import { baseApiUrl } from '@/global'
+
 import Carrousel from '../Carrousel/Carrousel.vue'
 import SectionTitle from '../utils/SectionTitle.vue'
 import NecessityCard from './NecessityCard.vue'
@@ -24,8 +27,20 @@ export default {
     components: { SectionTitle, Carrousel, NecessityCard },
     data() {
         return {
-            items: [1, 2, 3, 4, 5, 6]
+            needs: []
         }
+    },
+    methods: {
+        getActions() {
+            const url = `${baseApiUrl}/needs`
+            axios.get(url).then(res => {
+                /* Take the last 6 needs to put on the carrousel */
+                this.needs = res.data.needs.slice(0, 6)
+            })
+        }
+    },
+    mounted() {
+        this.getActions()
     }
 }
 </script>

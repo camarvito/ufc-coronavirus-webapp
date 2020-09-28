@@ -3,7 +3,7 @@
         <Navbar />
         <Header />
         <Actions />
-        <!-- <Productions /> -->
+        <Productions />
         <CallToAction />
         <Necessities />
         <Footer />
@@ -14,7 +14,7 @@
 import Header from '../components/Header/Header.vue'
 import Actions from '../components/Actions/Actions.vue'
 import Navbar from '../components/Header/Navbar.vue'
-// import Productions from '../components/Productions/Productions.vue'
+import Productions from '../components/Productions/Productions.vue'
 import CallToAction from '../components/Call to Action/CallToAction.vue'
 import Necessities from '../components/Necessities/Necessities.vue'
 import Footer from '../components/Footer/Footer.vue'
@@ -24,7 +24,7 @@ export default {
         Header,
         Actions,
         Navbar,
-        // Productions,
+        Productions,
         CallToAction,
         Necessities,
         Footer

@@ -63,7 +63,7 @@ export default {
     methods: {
         signin() {
             axios
-                .post(`${baseApiUrl}/sessions`, this.user)
+                .post(`${baseApiUrl}/users/login`, this.user)
                 .then(res => {
                     this.$store.commit('setUser', res.data)
                     localStorage.setItem(userKey, JSON.stringify(res.data))

@@ -7,8 +7,14 @@
 
             <div class="post__info">
                 <div class="post__info--headers">
-                    <h3>{{ action.user.fullname }}</h3>
-                    <h4>05 de abril de 2020 - 12h15</h4>
+                    <h3>Por {{ action.author.name }}</h3>
+                    <h4>{{ new Date(action.createdAt).toLocaleDateString('pt-br', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric'
+                        })}}</h4>
                     <h4>Última Atualizalição há uma hora</h4>
                 </div>
                 <div class="post__info--social">
@@ -31,7 +37,10 @@
 
             <SwitchLight />
 
-            <!-- <div>PHOTO</div> -->
+            <div class="post__image">
+              <img :src="action.imageUrl" alt="action-image">
+            </div>
+
             <div class="post__content" v-html="action.content"></div>
 
             <SectionTitle title="Recomendadas para você"></SectionTitle>
@@ -77,14 +86,15 @@ export default {
         loadAction() {
             const url = `${baseApiUrl}/actions/${this.$route.params.id}`
             axios.get(url).then(res => {
-                this.action = res.data
+                console.log(res)
+                this.action = res.data.action
             })
         },
         loadRecommended() {
             const url = `${baseApiUrl}/actions`
             axios.get(url).then(res => {
-                this.recommended = res.data
-                    .filter(el => el.id !== this.$route.params.id)
+                this.recommended = res.data.actions
+                    .filter(el => el._id !== this.$route.params.id)
                     .splice(0, 3)
             })
         }
@@ -174,6 +184,16 @@ export default {
                 margin-left: 1.5rem;
             }
         }
+    }
+
+    &__image {
+      display: flex;
+      justify-content: center;
+      margin: 3rem 0;
+
+      img {
+        border-radius: .7rem;
+      }
     }
 
     &__content {
